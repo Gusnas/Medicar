@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Medicar/appsettings.json
+/Infrastructure/ef_migration_script.py
