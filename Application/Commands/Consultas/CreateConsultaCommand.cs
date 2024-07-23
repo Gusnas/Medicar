@@ -3,11 +3,6 @@ using Application.Interfaces;
 using Application.ViewModel;
 using Domain.Entities;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Commands.Consultas
 {
@@ -37,25 +32,38 @@ namespace Application.Commands.Consultas
         {
             try
             {
-                var agendaHorario = _agendaHorarioRepository.Get(x => x.AgendaId == request.AgendaId && x.Horario == request.Horario && x.Disponivel == true);
+                DateTime now = DateTime.UtcNow;
+                DateOnly today = DateOnly.FromDateTime(now);
+                TimeOnly currentTime = TimeOnly.FromDateTime(now);
+
+                var agendaHorario = _agendaHorarioRepository.Get(x => x.AgendaId == request.AgendaId && x.Horario == request.Horario && x.Disponivel == true).FirstOrDefault();
                 if (agendaHorario == null)
-                    return new FailureResponse<ConsultaView>("Horário indisponível!");
+                    return await Task.FromResult(new FailureResponse<ConsultaView>("Horário indisponível!"));
+
                 var agenda = _agendaRepository.GetByID(request.AgendaId);
+                if (agenda.Dia < today || (agenda.Dia == today && request.Horario < currentTime))
+                    return await Task.FromResult(new FailureResponse<ConsultaView>("Não é possível marcar consulta para datas passadas!"));
 
                 Consulta consulta = new()
                 {
                     Horario = request.Horario,
-                    DataAgendamento = DateTime.Now,
+                    DataAgendamento = DateTime.UtcNow,
                     MedicoId = agenda.MedicoId,
-                    Dia = agenda.Dia
+                    Dia = agenda.Dia,
+                    AgendaHorarioId = agendaHorario.Id
                 };
 
                 _consultaRepository.Insert(consulta);
                 _consultaRepository.Save();
 
+                agendaHorario.Disponivel = false;
+
+                _agendaHorarioRepository.Update(agendaHorario);
+                _agendaHorarioRepository.Save();
+
                 ConsultaView consultaView = new()
                 {
-                    ConsultaId = consulta.Id,
+                    Id = consulta.Id,
                     Dia = consulta.Dia,
                     Horario = consulta.Horario,
                     DataAgendamento = consulta.DataAgendamento,

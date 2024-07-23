@@ -26,11 +26,7 @@ namespace MedicarAPI.Controllers
         [HttpPost(Name = "MarcarConsulta")]
         public async Task<IActionResult> PostAsync([FromBody] ConsultaRequest request)
         {
-            // validações
-            // validar se já existe consulta nesse horario
-            // validar se horario existe na agenda
-
-            var response = await _mediator.Send(new CreateConsultaCommand() { });
+            var response = await _mediator.Send(new CreateConsultaCommand() { AgendaId = request.AgendaId, Horario = TimeOnly.Parse(request.Horario)});
             return Ok(response);
         }
 

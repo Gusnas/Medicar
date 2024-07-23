@@ -19,16 +19,20 @@ namespace MedicarAPI.Controllers
         [HttpPost(Name = "CreateAgenda")]
         public async Task<IActionResult> PostAsync([FromBody] CreateAgendaRequest request)
         {
-            // validar se já existe agenda para o medico naquele dia
-            // validar se data é maior ou igual a hoje
             var response = await _mediator.Send(new CreateAgendaCommand { MedicoId = request.MedicoId, Dia = request.Dia, Horarios = request.Horarios });
             return Ok(response);
         }
 
         [HttpGet(Name = "GetAgenda")]
-        public async Task<IActionResult> GetAsync(GetAgendaRequest request)
+        public async Task<IActionResult> GetAsync([FromQuery] GetAgendaRequest request)
         {
-            var response = await _mediator.Send(new GetAgendaQuery {MedicoIds = request.MedicoIds, CRMs = request.CRMs, InitialDate = request.InitialDate, FinalDate = request.FinalDate });
+            var response = await _mediator.Send(new GetAgendaQuery
+            {
+                MedicoIds = request.MedicoIds,
+                CRMs = request.CRMs,
+                InitialDate = request.InitialDate.HasValue ? DateOnly.FromDateTime((DateTime)request.InitialDate) : null,
+                FinalDate = request.FinalDate.HasValue ? DateOnly.FromDateTime((DateTime)request.FinalDate) : null
+            });
             return Ok(response);
         }
     }

@@ -27,7 +27,13 @@ namespace Application.Commands.Agendas
         {
             try
             {
-                // validar se já existe agenda para esse medico nesse dia
+                var agendaExistent = _agendaRepository.Get(x => x.MedicoId == request.MedicoId && x.Dia == DateOnly.FromDateTime(request.Dia)).FirstOrDefault();
+                if (agendaExistent != null)
+                    return await Task.FromResult(new FailureResponse("Já existe uma agenda para este médico neste dia!"));
+
+                if (request.Dia.Date < DateTime.UtcNow.Date)
+                    return await Task.FromResult(new FailureResponse("Não é possível criar agenda para um dia passado!"));
+
                 Agenda agenda = new()
                 {
                     Dia = DateOnly.FromDateTime(request.Dia),

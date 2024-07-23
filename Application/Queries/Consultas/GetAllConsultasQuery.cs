@@ -26,19 +26,26 @@ namespace Application.Queries.Consultas
         {
             try
             {
-                var consultas = _consultaRepository.Get();
+                DateTime now = DateTime.UtcNow;
+                DateOnly today = DateOnly.FromDateTime(now);
+                TimeOnly currentTime = TimeOnly.FromDateTime(now);
+
+                var consultas = _consultaRepository.Get(x => x.Dia > today || (x.Dia == today && x.Horario > currentTime));
                 List<ConsultaView> consultasView = new();
                 foreach (var item in consultas)
                 {
                     ConsultaView consulta = new()
                     {
-                        ConsultaId = item.Id,
+                        Id = item.Id,
                         DataAgendamento = item.DataAgendamento,
                         Dia = item.Dia,
                         Horario = item.Horario,
                         Medico = _medicoRepository.GetByID(item.MedicoId)
                     };
+                    consultasView.Add(consulta);
                 }
+
+                consultasView = consultasView.OrderBy(x => x.Dia).ThenBy(x => x.Horario).ToList();
 
                 return await Task.FromResult(new SuccessResponse<IEnumerable<ConsultaView>>(consultasView));
             }

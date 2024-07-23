@@ -13,5 +13,7 @@ namespace Domain.Entities
         public DateTime DataAgendamento { get; set; }
         [ForeignKey("Medico")]
         public int MedicoId { get; set; }
+        [ForeignKey("AgendaHorario")]
+        public int AgendaHorarioId { get; set; }
     }
 }

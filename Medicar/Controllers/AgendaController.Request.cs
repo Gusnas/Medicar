@@ -10,10 +10,11 @@
         }
         public class GetAgendaRequest
         {
-            public List<int> MedicoIds { get; set; }
-            public List<string> CRMs { get; set; }
-            public DateOnly InitialDate { get; set; }
-            public DateOnly FinalDate { get; set; }
+            
+            public List<int>? MedicoIds { get; set; }
+            public List<string>? CRMs { get; set; }
+            public DateTime? InitialDate { get; set; }
+            public DateTime? FinalDate { get; set; }
         }
     }
 }

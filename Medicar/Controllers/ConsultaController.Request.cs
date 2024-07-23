@@ -5,7 +5,7 @@
         public class ConsultaRequest
         {
             public int AgendaId { get; set; }
-            public TimeOnly Horario { get; set; }
+            public string Horario { get; set; }
         }
     }
 }
