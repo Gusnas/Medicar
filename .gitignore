@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /Medicar/appsettings.json
 /Infrastructure/ef_migration_script.py
+/Medicar/appsettings.Development.json
